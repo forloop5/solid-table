@@ -1,0 +1,13 @@
+$DHCPServer = "cps-dhcp-dns-1"
+$allscope = Get-DhcpServerv4Scope -ComputerName $DHCPServer
+  foreach ($ScopeID in $allscope) 
+    {
+      $names = Get-DhcpServerv4Lease -ComputerName $DHCPServer -ScopeId $ScopeID.scopeid | 
+      where {$_.hostname -like "*iphone*"}
+        foreach ($name in $names)
+          {
+            write-host $name.hostname " has been added to the deny list in DHCP"
+            Add-DhcpServerv4Filter -ComputerName $DHCPServer -List deny -MacAddress $name.clientid
+          }
+
+    }
